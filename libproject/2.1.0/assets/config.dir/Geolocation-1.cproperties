@@ -1,0 +1,6 @@
+enabled=false
+accuracy=2
+altitudeRequired=false
+powerRequirement=1
+windowInterval=3600000
+windowDuration=30000
