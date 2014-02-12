@@ -1,0 +1,5 @@
+
+    <resources>
+        <string name="oauth_notification_title">Additional credentials required.</string>
+        <string name="oauth_notification_text">Credentials are required for an external service.  Tap to launch the authorization process.</string>
+    </resources>

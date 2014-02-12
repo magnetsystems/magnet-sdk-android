@@ -14,7 +14,7 @@ if [ "$1" == "help" -o $# -eq 0 -o $# -gt 3 ]; then
     echo ' [api-lib-dir]              : directory to the api library jars. Generated service mapping jar goes here'
     echo ' -clean                     : remove generated files'
     echo
-    echo ' Example: ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.1.0 ./libs'
+    echo ' Example: ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.2.0 ./libs'
     echo
     exit 1
 fi
@@ -80,8 +80,8 @@ java -jar ${MYSDKDIR}/tools-lib/magnet-core-mobile-android-build-tool-${VERSION}
 echo "Removing unneeded generated files..."
 rm -rf ${MYSDKDIR}/libs/config.dir
 
-echo "Copy required assets..."
-if [ ! -d ${MYDIR}/assets/config.dir ]; then
-mkdir -p ${MYDIR}/assets/config.dir
-fi
-cp -n ${SDKDIR}/assets/config.dir/* ${MYDIR}/assets/config.dir
+# echo "Copy required assets..."
+# if [ ! -d ${MYDIR}/assets/config.dir ]; then
+# mkdir -p ${MYDIR}/assets/config.dir
+# fi
+#cp -n ${SDKDIR}/assets/config.dir/* ${MYDIR}/assets/config.dir

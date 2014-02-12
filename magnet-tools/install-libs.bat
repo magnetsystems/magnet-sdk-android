@@ -53,12 +53,6 @@ java -jar %MYSDKDIR%\tools-lib\magnet-core-mobile-android-build-tool-%VERSION%-s
 echo "Removing unneeded generated files..."
 rmdir/s/q %MYSDKDIR%\libs\config.dir
 
-echo "Copy required assets..."
-REM don't clean out destination in case users changed some files
-REM rmdir/s/q %MYDIR%\assets\config.dir
-mkdir %MYDIR%\assets\config.dir
-REM Exclude Geolocation in case end user changed it
-robocopy %SDKDIR%\assets\config.dir %MYDIR%\assets\config.dir /XF Geolocation-1.cproperties
 GOTO DONE
 
 :CLEANUP
@@ -81,7 +75,7 @@ echo ' [magnet-lib-project-dir]  : directory to the Magnet library Android proje
 echo ' [api-lib-dir]             : directory to the api library jars'
 echo '  -clean                   : remove generated files'
 echo.
-echo ' Example: ..\magnet-sdk-android\magnet-tools\install-lib.bat ..\magnet-sdk-android\libproject\2.1.0 .\libs'
+echo ' Example: ..\magnet-sdk-dir\magnet-tools\install-lib.bat ..\magnet-sdk-dir\libproject/2.2.0 .\libs'
 echo.
 
 :DONE
