@@ -32,12 +32,12 @@ Enable manifest merging by adding this line to project.properties:
 
 ## Optional: Google Play Services Client library
 
-Certains features of the Magnet library is dependent on the Google Play Services client library such as geo constraints and offline requests. Please follow instructions on [Google's Google Play Services website] (http://developer.android.com/google/play-services/setup.html) on how to add this library to your Android project. Below is a short summary of the instructions.
+Certains features of the Magnet library is dependent on the Google Play Services client library such as geo constraints and offline requests. Please follow instructions on [Google's Google Play Services website] (http://developer.android.com/google/play-services/setup.html) on how to add this library to your Android project. Below is a short summary of the instructions for ANT.
 
 
-### Google Play Services using Ant
+### Google Play Services using ANT
 
-To add the Google Play Client Services library using Ant, follow these steps:
+To add the Google Play Client Services library using ANT, follow these steps:
 
 1. Use the Android SDK Manager to install Google Play Services.
 2. Copy the directory located at extras/google/google_play_services/libproject/google-play-services_lib to another directory.
@@ -52,9 +52,12 @@ To add the Google Play Client Services library using Ant, follow these steps:
         $ android update project --path . --library <relative-path>/google-play-services_lib --target <target-id>
 
 
-### Google Play Services using Eclipse
+### Google Play Services - Required AndroidManifest changes
 
-Follow instructions on how to add an [Android library to an Eclipse project] (http://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject).
+Make sure to add the following to the application's AndroidManifest.xml, as child of <application> element:
+
+    <meta-data android:name="com.google.android.gms.version"
+           android:value="@integer/google_play_services_version" />
 
 ### Build Android Apps with Magnet library using ANT
 
