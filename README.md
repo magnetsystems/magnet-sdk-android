@@ -1,6 +1,6 @@
 ## Magnet Mobile Server SDK for Android
 
-The Magnet Mobile Server SDK for Android is licensed under the terms of the [Magnet Software License Agreement](http://www.magnet.com/resources/tos.html). See [LICENSE](LICENSE) file for full details.
+The Magnet Mobile Server SDK for Android is licensed under the terms of the [Magnet Software License Agreement](http://www.magnet.com/resources/tos.html). See [LICENSE](https://github.com/magnetsystems/magnet-sdk-android/blob/master/LICENSE) file for full details.
 
 
 This directory contains the Magnet Mobile Server SDK for Android which includes tools and the library to build your Android app for a Mobile App Server project.
