@@ -14,7 +14,7 @@ Android API level 15 and up.
 
 From directory of your Android application project, install the library to your project using relative path to the SDK directory. For example, assuming the SDK directory is one level above the application project directory named "magnet-sdk-android":
 
-    $ sh ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.2.0 ./libs
+    $ sh ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.2.1 ./libs
 
 General Usage:
 
@@ -24,7 +24,7 @@ General Usage:
 
 For Windows:
 
-    $ ..\magnet-sdk-android\magnet-tools\install-libs.bat ..\magnet-sdk-android\libproject\2.2.0 .\libs
+    $ ..\magnet-sdk-android\magnet-tools\install-libs.bat ..\magnet-sdk-android\libproject\2.2.1 .\libs
 
 Enable manifest merging by adding this line to project.properties:
 
@@ -63,11 +63,11 @@ Make sure to add the following to the application's AndroidManifest.xml, as chil
 
 Add the Magnet library as a dependent library to the ANT xml file project.properties. Use a relative path. For example, run this from your Android project directory:
 
-    $ android update project --path . --library ../magnet-sdk-android/libproject/2.2.0 --target <target-id>
+    $ android update project --path . --library ../magnet-sdk-android/libproject/2.2.1 --target <target-id>
 
 For Windows:
 
-    $ android.bat update project --path . --library ..\magnet-sdk-android\libproject\2.2.0 --target <target-id>
+    $ android.bat update project --path . --library ..\magnet-sdk-android\libproject\2.2.1 --target <target-id>
 
 Note: "--target" option is required for "android" command for new projects. For more details, refer to Android Developer Guide, [Managing Project from Command Line] (http://developer.android.com/tools/projects/projects-cmdline.html).
 
@@ -82,7 +82,7 @@ Build your app with ANT:
 Create the Magnet library as an "Android Library" project and include it in your Android app as a dependency:
 
 1. File->New Project->Android->Android Project from Existing Code
-2. Browse to the unzipped Magnet library project directory and select "libproject/2.2.0" as the "Root Directory".
+2. Browse to the unzipped Magnet library project directory and select "libproject/2.2.1" as the "Root Directory".
 A new Android project will be created with the name "OAuthFlowActivity."
 4. Select the newly created library project and right click Properties, under "Android", "is library" must be checked.
 5. From your main Android application project, add the library project under Project Properties->"Android", select the "OAuthFlowActivity" library project and add it.
@@ -99,11 +99,11 @@ To use custom controller APIs, integrate the library into your application build
 
 First, copy the custom controller api jar files to the directory where all dependent libraries are stored, typically "libs". Then, regenerate the Mobile App Server Runtime service mapping library using the script "install-libs.sh" as described above.
 
-    $ sh ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.2.0 ./libs
+    $ sh ../magnet-sdk-android/magnet-tools/install-libs.sh ../magnet-sdk-android/libproject/2.2.1 ./libs
 
 For Windows:
 
-    $ ..\magnet-sdk-android\magnet-tools\install-libs.bat ..\magnet-sdk-android\libproject\2.2.0 .\libs
+    $ ..\magnet-sdk-android\magnet-tools\install-libs.bat ..\magnet-sdk-android\libproject\2.2.1 .\libs
 
 ##### IMPORTANT: If you use Eclipse, after running "install-libs", you must do "Refresh" on the "libs" directory of your Android project before building the app to ensure getting the latest contents.
 
