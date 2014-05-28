@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013, Magnet Systems Inc.  All Rights Reserved.
+ * Copyright (C) 2013-2014, Magnet Systems Inc.  All Rights Reserved.
  */
 package com.magnet.android.mms.async.constraint;
 
@@ -41,7 +41,7 @@ public class GeoRegionConstraint implements Constraint, Serializable {
     }
   }
   
-  private boolean IsPointInPolygon(Point[] poly, Point point) {
+  private boolean isPointInPolygon(Point[] poly, Point point) {
     boolean c = false;
     for (int i = 0, j = poly.length - 1; i < poly.length; j = i++) {
       Point ipoly = poly[i];
@@ -75,13 +75,14 @@ public class GeoRegionConstraint implements Constraint, Serializable {
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
-    if (Log.isLoggable(Log.DEBUG))
+    if (Log.isLoggable(Log.DEBUG)) {
       Log.d(TAG, "getLastLocation() loc="+loc);
+    }
     if (loc == null) {
       return false;
     }
     Point point = new Point(loc.getLatitude(), loc.getLongitude());
-    boolean allowed = (mIn == IsPointInPolygon(mRegion, point));
+    boolean allowed = (mIn == isPointInPolygon(mRegion, point));
     
     if (Log.isLoggable(Log.DEBUG))
       Log.d(TAG, "isAllowed() returns "+allowed);
@@ -90,6 +91,7 @@ public class GeoRegionConstraint implements Constraint, Serializable {
 
   @Override
   public void stopInBackground(Context appContext) {
+    // No-op.
   }
   
   @Override

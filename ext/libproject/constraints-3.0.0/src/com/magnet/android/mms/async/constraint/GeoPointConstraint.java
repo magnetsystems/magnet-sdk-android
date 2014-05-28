@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013, Magnet Systems Inc.  All Rights Reserved.
+ * Copyright (C) 2013-2014, Magnet Systems Inc.  All Rights Reserved.
  */
 package com.magnet.android.mms.async.constraint;
 
@@ -59,8 +59,9 @@ public class GeoPointConstraint implements Constraint, Serializable {
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
-    if (Log.isLoggable(Log.DEBUG))
+    if (Log.isLoggable(Log.DEBUG)) {
       Log.d(TAG, "isAllowed(): getLastLocation() loc="+loc);
+    }
     if (loc == null)
       return false;
     Location fence = new Location("");
@@ -76,28 +77,28 @@ public class GeoPointConstraint implements Constraint, Serializable {
     
   @Override
   public void stopInBackground(Context appContext) {
-    if (Log.isLoggable(Log.DEBUG))
+    if (Log.isLoggable(Log.DEBUG)) {
       Log.d(TAG, "stopInBackground() id="+mId);
+    }
     LocationReceiver.removeGeofences(appContext, Arrays.asList(new String[] { mId })); 
   }
   
   @Override
   public void startInBackground(Context appContext) {
-    if (Log.isLoggable(Log.DEBUG))
+    if (Log.isLoggable(Log.DEBUG)) {
       Log.d(TAG, "startInBackground()");
-    addGeoFence(appContext);
-  }
-  
-  // Use Google Play Location Service to monitor the geo-fence.
-  private void addGeoFence(Context context) {
+    }
+    
+    // Use Google Play Location Service to monitor the geo-fence transition.
     Geofence[] fences = { new Geofence.Builder()
       .setRequestId(mId)
       .setCircularRegion(mLat, mLng, mRadius)
       .setExpirationDuration(mDuration)
-      .setTransitionTypes(mIn ?
-        Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT)
-      .build() };
+      .setTransitionTypes(mIn ? Geofence.GEOFENCE_TRANSITION_ENTER : 
+                                Geofence.GEOFENCE_TRANSITION_EXIT)
+      .build()
+    };
     List<Geofence> list = Arrays.asList(fences);
-    LocationReceiver.addGeofences(context, list);
+    LocationReceiver.addGeofences(appContext, list);
   }
 }
