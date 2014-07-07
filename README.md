@@ -52,28 +52,30 @@ Before running the Android app, you will need to build the Mobile backend. You c
 ### Integrating Magnet generated API assets to the Android project
 
 
-In order to use additional custom controller APIs, the generated assets from the Mobile App Builder tool must be copied to your Android project. The assets are created using "api-generate -wfc android" mab command.
+In order to use additional custom controller APIs, the generated assets from the Mobile App Builder tool must be copied to your Android project. The assets are created using "api-generate -wfc android" mab command. Using "jumpstart" as the example backend project:
 
 1. Generate Assets for Android from mab tool:
 		
 		mab> api-generate -wfc android
 		
-2. Generated source for controllers:
+2. Generated source for controllers to project source directory:
 
-    	mab> exec cp -R ~/MABProjects/jumpstart/mobile/apis/assets/android/com/magnetapi/* </path/to/MyAndroidProject/src/com/magnetapi>
-    
-    	mab> exec cp -R ~/MABProjects/jumpstart/mobile/apis/assets/android/com/magnet/* </path/to/MyAndroidProject/src/com/magnet>
-    
+        mab> exec cp -R ~/MABProjects/jumpstart/mobile/apis/assets/android/com/magnetapi/ </path/to/MyAndroidProject/src/com/magnetapi>
 
-3. Generated java library jar:
+        mab> exec cp -R ~/MABProjects/jumpstart/mobile/apis/assets/android/com/magnet/ </path/to/MyAndroidProject/src/com/magnet>
 
-		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/beans.jar </path/to/MyAndroidProject/libs>
 
-4. Generated config files:
+3. Generated java library jar to "libs" directory:
+
+		mab> exec mkdir -p </path/to/MyAndroidProject/libs>
+		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/beans.jar </path/to/MyAndroidProject/libs/>
+
+4. Generated config files to "res/xml" directory:
 		
-		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/magnet_type_mapper.xml </path/to/MyAndroidProject/res/xml>
+		mab> exec mkdir -p </path/to/MyAndroidProject/res/xml>
+		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/magnet_type_mapper.xml </path/to/MyAndroidProject/res/xml/>
 
-		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/magnet_app_default.xml </path/to/MyAndroidProject/res/xml>
+		mab> exec cp ~/MABProjects/jumpstart/mobile/apis/assets/android/magnet_app_default.xml </path/to/MyAndroidProject/res/xml/>
 
 5. Start using the generated controller classes in your Android code!
 
