@@ -1,0 +1,6 @@
+# view AndroidManifest.xml #generated:22
+-keep class com.magnet.android.mms.async.AsyncIntentService { <init>(...); }
+
+# view AndroidManifest.xml #generated:15
+-keep class com.magnet.android.mms.async.constraint.NetworkStateReceiver { <init>(...); }
+

@@ -1,0 +1,10 @@
+com.magnet.android.mms
+com.magnet.android.mms.async
+com.magnet.android.mms.async.constraint
+com.magnet.android.mms.async.tag
+com.magnet.android.mms.connection
+com.magnet.android.mms.controller
+com.magnet.android.mms.exception
+com.magnet.android.mms.settings
+com.magnet.android.mms.utils
+com.magnet.android.mms.utils.logger
