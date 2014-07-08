@@ -31,11 +31,19 @@ public class GeoRegionConstraint implements Constraint, Serializable {
   private Point[] mRegion;
   private boolean mIn;
   
+  /**
+   * A location point with latitude and longitude.
+   */
   public static class Point implements Serializable {
     private static final long serialVersionUID = -7941549396654571438L;
     double lat;
     double lng;
 
+    /**
+     * Default constructor with latitude and longitude.
+     * @param lat A latitude.
+     * @param lng A longitude.
+     */
     public Point(double lat, double lng) {
       this.lat = lat;
       this.lng = lng;
@@ -61,11 +69,14 @@ public class GeoRegionConstraint implements Constraint, Serializable {
    * Default Constructor.
    * @param appContext The application context.
    * @param id A unique name for this region.
-   * @param region A region represented by a polygon
+   * @param region A region represented by a polygon with at least 3 points.
    * @param in True for inside the region; false for outside the region.
    */
   public GeoRegionConstraint(Context appContext, String id, Point[] region,
                               boolean in) {
+    if (region == null || region.length < 3) {
+      throw new IllegalArgumentException("A region must have at least 3 points.");
+    }
     mId = id;
     mRegion = region;
     mIn = in;
@@ -81,17 +92,17 @@ public class GeoRegionConstraint implements Constraint, Serializable {
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
-    if (Log.isLoggable(Log.DEBUG)) {
-      Log.d(TAG, "getLastLocation() loc="+loc);
-    }
     if (loc == null) {
+      if (Log.isLoggable(Log.DEBUG)) {
+        Log.d(TAG, "getLastLocation() loc="+loc);
+      }
       return false;
     }
     Point point = new Point(loc.getLatitude(), loc.getLongitude());
     boolean allowed = (mIn == isPointInPolygon(mRegion, point));
     
     if (Log.isLoggable(Log.DEBUG))
-      Log.d(TAG, "isAllowed() returns "+allowed);
+      Log.d(TAG, "isAllowed() loc="+loc+", returns "+allowed);
     return allowed;
   }
 

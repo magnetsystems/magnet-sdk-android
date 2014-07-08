@@ -16,12 +16,12 @@ import android.location.Location;
 
 /**
  * This constraint gates for a circular geo-fence.  This class requires
- * Google Play Service and {@link LocationReceiver}
+ * Google Play Service and {@link LocationReceiver}.
  * <br>
  * Caller must specify a broadcast receiver
  * {@link com.magnet.android.mms.async.constraint.LocationReceiver} in 
- * AndroidManifest.xml to drain any queued requests when the application is not
- * running.
+ * AndroidManifest.xml to process the queued requests when the application is
+ * not running.
  * @see com.magnet.android.mms.async.constraint.LocationReceiver
  */
 public class GeoPointConstraint implements Constraint, Serializable {
@@ -39,11 +39,14 @@ public class GeoPointConstraint implements Constraint, Serializable {
 
   /**
    * Default Constructor.  The duration becomes effective only after the request
-   * was queued.
+   * was queued.  It is strongly recommended that the <code>duration</code> is
+   * set to {@link Geofence#NEVER_EXPIRE} because this constraint is not aware
+   * of the expiration of the geo-fence which is managed by Google Play Service.
    * @param appContext The application context.
    * @param id A unique name (e.g. call ID or timestamp) for each call.
-   * @param location Latitude/longitude
-   * @param radius The radius in meters
+   * @param lat The latitude of the center point.
+   * @param lng The longitude of the center point.
+   * @param radius The radius in meters.
    * @param duration {@link Geofence#NEVER_EXPIRE} or duration in milliseconds.
    * @param in True for inside the fence; false for outside the fence.
    */
@@ -63,15 +66,18 @@ public class GeoPointConstraint implements Constraint, Serializable {
   /**
    * Check if the constraint condition is met.
    * @param appContext The application context.
+   * @return true if the constraint is met; false if not met.
    */
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
-    if (Log.isLoggable(Log.DEBUG)) {
-      Log.d(TAG, "isAllowed(): getLastLocation() loc="+loc);
-    }
-    if (loc == null)
+    if (loc == null) {
+      if (Log.isLoggable(Log.DEBUG)) {
+        Log.d(TAG, "isAllowed(): getLastLocation() loc="+loc);
+      }
       return false;
+    }
+    
     Location fence = new Location("");
     fence.setLatitude(mLat);
     fence.setLongitude(mLng);
