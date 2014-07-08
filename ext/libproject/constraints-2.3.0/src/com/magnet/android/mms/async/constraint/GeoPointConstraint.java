@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.LocationRequest;
 import com.magnet.android.mms.utils.logger.Log;
 
 import android.content.Context;
@@ -26,6 +27,8 @@ import android.location.Location;
 public class GeoPointConstraint implements Constraint, Serializable {
   private static final long serialVersionUID = 1315207650834154735L;
   private final static String TAG = "GeoPointConstraint";
+  private final static long UPDATE_INTERVAL = 60 * 1000L; // 1 min
+  private final static float UPDATE_DISPLACEMENT = 10.0f; // 10 meters
 
   private String mId;
   private double mLat;
@@ -37,6 +40,7 @@ public class GeoPointConstraint implements Constraint, Serializable {
   /**
    * Default Constructor.  The duration becomes effective only after the request
    * was queued.
+   * @param appContext The application context.
    * @param id A unique name (e.g. call ID or timestamp) for each call.
    * @param location Latitude/longitude
    * @param radius The radius in meters
@@ -55,7 +59,11 @@ public class GeoPointConstraint implements Constraint, Serializable {
     // Connect to Google Play Location Service.
     LocationReceiver.init(appContext, 5000L);
   }
-    
+  
+  /**
+   * Check if the constraint condition is met.
+   * @param appContext The application context.
+   */
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
@@ -75,6 +83,10 @@ public class GeoPointConstraint implements Constraint, Serializable {
     return (mIn == GeoUtil.inCircle(loc, fence, mRadius));
   }
     
+  /**
+   * Stop monitoring this constraint after the call is done.
+   * @param appContext The application context.
+   */
   @Override
   public void stopInBackground(Context appContext) {
     if (Log.isLoggable(Log.DEBUG)) {
@@ -83,6 +95,10 @@ public class GeoPointConstraint implements Constraint, Serializable {
     LocationReceiver.removeGeofences(appContext, Arrays.asList(new String[] { mId })); 
   }
   
+  /**
+   * Start monitoring this constraint after the call is queued.
+   * @param appContext The application context.
+   */
   @Override
   public void startInBackground(Context appContext) {
     if (Log.isLoggable(Log.DEBUG)) {
@@ -100,5 +116,14 @@ public class GeoPointConstraint implements Constraint, Serializable {
     };
     List<Geofence> list = Arrays.asList(fences);
     LocationReceiver.addGeofences(appContext, list);
+    
+    // Specify the QoS for location updates to Google Play Service.
+    if (!LocationReceiver.isQosSet(appContext)) {
+      LocationRequest request = LocationRequest.create();
+      request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+      request.setInterval(UPDATE_INTERVAL);
+      request.setSmallestDisplacement(UPDATE_DISPLACEMENT);
+      LocationReceiver.setQos(appContext, request);
+    }
   }
 }

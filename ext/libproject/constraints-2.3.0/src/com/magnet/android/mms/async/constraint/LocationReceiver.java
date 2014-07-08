@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
@@ -31,7 +32,8 @@ import android.widget.Toast;
  * for reliable asynchronous calls using Google Play Service.  If a circular 
  * geo-fencing criteria or a polygon geo-fencing (enter or exit) is met, a
  * pending requests will be processed from the queues. Developer must bundle 
- * the Google Play Service library in the apk.
+ * the Google Play Service library in the apk.  Also, developer should include
+ * this extra constraints as a libproject.
  * 
  * In the AndroidManifest.xml, developer must specify a meta-data tag for Google
  * Play Service, the permission, receiver and AsyncIntentService:
@@ -172,13 +174,25 @@ public class LocationReceiver extends BroadcastReceiver {
   }
 
   /**
-   * Initialize this receiver where there is at least one pending request.  It
+   * Initialize this receiver when there is at least one pending request.  It
    * will connect to the Google Play Service for location update or geo-fence
    * transition change.
    * @param context The application context.
-   * @param timeout
+   * @param timeout Connection timeout in milliseconds.
+   * @return true if connected; false if not connected.
    */
-  public static boolean init(Context context, long timeout) {
+  public static boolean init(Context context, long timeout ) {
+    int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+    if (status != ConnectionResult.SUCCESS) {
+      String[] googlePlaySvcStat = { "SUCCESS", "SERVICE MISSING", 
+          "SERVICE VERSION UPDATE REQUIRED", "SERVICE DISABLED", 
+          "SIGN_IN_REQUIRED", "INVALID ACCOUNT", "RESOLUTION REQUIRED",
+          "NETWORK ERROR", "INTERNAL ERROR", "SERVICE_INVALID",
+          "DEVELOPER_ERROR", "LICENSE_CHECK_FAILED", "DATE INVALID" };
+      Log.e(TAG, "Google Play Service status: "+googlePlaySvcStat[status]);
+      return false;
+    }
+    
     if (sLocClient == null) {
       synchronized (sConnectionCallbacks) {
         if (sLocClient == null) {
@@ -193,8 +207,9 @@ public class LocationReceiver extends BroadcastReceiver {
         return true;
       }
       try {
-        if (Log.isLoggable(Log.DEBUG))
-          Log.d(TAG, "Connecting to Location Client...");
+        if (Log.isLoggable(Log.DEBUG)) {
+          Log.d(TAG, "Connecting to Location Client... wait("+timeout+")");
+        }
         if (timeout > 0L) {
           sLocClient.wait(timeout);
         } else {
@@ -232,16 +247,21 @@ public class LocationReceiver extends BroadcastReceiver {
   }
   
   /**
-   * Get the last known location using Google Play Service.
+   * Get the last known location using Google Play Location Service.
    * @param context The application context.
    * @return null if Location Service is not available; otherwise, a location.
    */
   public static Location getLastLocation(Context context) {
     try {
+      boolean inited = true;
       if (sLocClient == null || !sLocClient.isConnected()) {
-        LocationReceiver.init(context, 10000L);
+        inited = LocationReceiver.init(context, 10000L);
       }
-      return sLocClient.getLastLocation();
+      if (inited) {
+        return sLocClient.getLastLocation();
+      } else {
+        return null;
+      }
     } catch (Throwable e) {
       Log.e(TAG, "Unable to get last location", e);
       return null;
@@ -249,10 +269,10 @@ public class LocationReceiver extends BroadcastReceiver {
   }
   
   /**
-   * Get the last known location using Google Play Service or Android Location
-   * Service via passive provider.
-   * @param context
-   * @return
+   * Get the last known location using Google Play Location Service or Android
+   * Location Service via passive provider.
+   * @param context The application context.
+   * @return The last known location, or null.
    */
   public static Location getLastKnownLocation(Context context) {
     try {
@@ -263,7 +283,7 @@ public class LocationReceiver extends BroadcastReceiver {
       if (inited) {
         return sLocClient.getLastLocation();
       } else {
-        Log.w(TAG, "Google Play Location Service is not available, use passive provider for last location");
+        Log.w(TAG, "Use passive provider from Android Location Service for last location");
         LocationManager locMgr = (LocationManager) context.getSystemService(
             Context.LOCATION_SERVICE);
         return locMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
@@ -275,9 +295,9 @@ public class LocationReceiver extends BroadcastReceiver {
   }
 
   /**
-   * Add geofences.  Each geofence must have an ID.
-   * @param context
-   * @param list
+   * Add one or more points as geo-fences.  Each geo-fence must have an ID.
+   * @param context The application context.
+   * @param list A list of geo-fences.
    */
   public static void addGeofences(Context context, List<Geofence> list) {
     boolean inited = true;
@@ -303,8 +323,8 @@ public class LocationReceiver extends BroadcastReceiver {
   
   /**
    * Remove the geofences by their ID's.
-   * @param context
-   * @param ids A list of geofence ID.
+   * @param context The application context.
+   * @param ids A list of geo-fence ID.
    */
   public static void removeGeofences(Context context, List<String> ids) {
     boolean inited = true;
@@ -319,31 +339,38 @@ public class LocationReceiver extends BroadcastReceiver {
   }
   
   /**
-   * Request for location updates from Google Play Service.  Prior to this
-   * method, {@link #init(Context, long)} must be called first.
-   * @param context
-   * @param request
+   * Specify the quality of service for location updates from Google Play 
+   * Service.  Any existing QoS will be overwritten.
+   * @param context The application context.
+   * @param qosRqt A non-null QoS request.
+   * @return true for QoS set successfully; false for failure.
    */
-  public static void requestLocationUpdates(Context context, 
-                                              LocationRequest request) {
+  public static boolean setQos(Context context, LocationRequest qosRqt ) {
     boolean inited = true;
     if (sLocClient == null || !sLocClient.isConnected()) {
       inited = LocationReceiver.init(context, 10000L);
     }
     if (!inited) {
-      Log.e(TAG, "requestLocationUpdates() failed: "+NOT_READY);
-    } else if (sPendingIntent == null) {
-      Log.d(TAG, "Enabling requestLocationUpdates()");
-      Intent intent = (new Intent(LocationReceiver.ACTION_LOCATION_CHANGE))
-          .setPackage(context.getPackageName())
-          .addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING)
-          .putExtra(EXTRA_IS_TRANSITION, false);
-      
-      sPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(),
-          LOCATION_UPDATE_REQUEST, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-      sLocClient.requestLocationUpdates(request, sPendingIntent);
-    } else {
-      Log.d(TAG, "requestLocationUpdates() already enabled");
+      Log.e(TAG, "Google Play Service: "+NOT_READY);
+      return false;
     }
+    Log.d(TAG, "Enabling requestLocationUpdates()");
+    Intent intent = (new Intent(LocationReceiver.ACTION_LOCATION_CHANGE))
+        .setPackage(context.getPackageName())
+        .addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING)
+        .putExtra(EXTRA_IS_TRANSITION, false);
+    sPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(),
+        LOCATION_UPDATE_REQUEST, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    sLocClient.requestLocationUpdates(qosRqt, sPendingIntent);
+    return true;
+  }
+  
+  /**
+   * Check if the QoS for location updates is set.
+   * @param context The application context.
+   * @return true if location updates QoS is set; otherwise, false.
+   */
+  public static boolean isQosSet(Context context) {
+    return sPendingIntent != null;
   }
 }

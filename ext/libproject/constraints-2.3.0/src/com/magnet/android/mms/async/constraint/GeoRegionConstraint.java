@@ -25,6 +25,7 @@ public class GeoRegionConstraint implements Constraint, Serializable {
   private static final long serialVersionUID = 9134773120011606309L;
   private final static String TAG = "GeoRegionConstraint";
   private final static long UPDATE_INTERVAL = 60 * 1000L; // 1 min
+  private final static float UPDATE_DISPLACEMENT = 10.0f; // 10 meters
 
   private String mId;
   private Point[] mRegion;
@@ -58,6 +59,7 @@ public class GeoRegionConstraint implements Constraint, Serializable {
 
   /**
    * Default Constructor.
+   * @param appContext The application context.
    * @param id A unique name for this region.
    * @param region A region represented by a polygon
    * @param in True for inside the region; false for outside the region.
@@ -72,6 +74,10 @@ public class GeoRegionConstraint implements Constraint, Serializable {
     LocationReceiver.init(appContext, 5000L);
   }
 
+  /**
+   * Check if the constraint condition is met.
+   * @param appContext The application context.
+   */
   @Override
   public boolean isAllowed(Context appContext) {
     Location loc = LocationReceiver.getLastLocation(appContext);
@@ -89,21 +95,32 @@ public class GeoRegionConstraint implements Constraint, Serializable {
     return allowed;
   }
 
+  /**
+   * Stop monitoring this constraint after the call is done.
+   * @param appContext The application context.
+   */
   @Override
   public void stopInBackground(Context appContext) {
     // No-op.
   }
   
+  /**
+   * Start monitoring this constraint after the call is queued.
+   * @param appContext The application context.
+   */
   @Override
   public void startInBackground(Context appContext) {
     if (Log.isLoggable(Log.DEBUG)) {
       Log.d(TAG, "startInBackground() id="+mId);
     }
     
-    // Set up a location update request to Google Play Service.
-    LocationRequest request = LocationRequest.create();
-    request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    request.setInterval(UPDATE_INTERVAL);
-    LocationReceiver.requestLocationUpdates(appContext, request);
+    // Specify the QoS for location updates to Google Play Service.
+    if (!LocationReceiver.isQosSet(appContext)) {
+      LocationRequest request = LocationRequest.create();
+      request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+      request.setInterval(UPDATE_INTERVAL);
+      request.setSmallestDisplacement(UPDATE_DISPLACEMENT);
+      LocationReceiver.setQos(appContext, request);
+    }
   }
 }
