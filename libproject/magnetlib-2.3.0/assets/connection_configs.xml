@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connection-configs>
+    <connection-config>
+        <name>jumpstart</name>
+        <uri>http://10.0.2.2:8080/rest</uri>
+        <type>MAGNET_REST</type>
+        <auth-handler-class>com.magnet.android.mms.connection.MagnetRestAuthHandler</auth-handler-class>
+        <realm>magnet</realm>
+    </connection-config>
+</connection-configs>
